@@ -30,39 +30,10 @@ export class UserService {
 
       return await this.prisma.user.create({
         data: {
-          username: userData.username,
           name: userData.name,
           email: userData.email,
-          slug: userData.name.toLowerCase().replace(/\s+/g, '-'),
           password: userData.password,
-          worksAt: userData.worksAt,
-          location: userData.location,
-          linkedin: userData.linkedin,
-          github: userData.github,
-          website: userData.website,
-          bio: userData.bio,
-          about: userData.about,
-          image:
-            userData.image ||
-            `https://avatar.vercel.sh/${userData.name.toLowerCase().replace(/\s+/g, '-')}`,
-          especialities: {
-            connectOrCreate: userData.especialities.map((especiality) => ({
-              where: { slug: especiality.toLowerCase().replace(/\s+/g, '-') },
-              create: {
-                name: especiality,
-                slug: especiality.toLowerCase().replace(/\s+/g, '-'),
-              },
-            })),
-          },
-          technologies: {
-            connectOrCreate: userData.technologies.map((technology) => ({
-              where: { slug: technology.toLowerCase().replace(/\s+/g, '-') },
-              create: {
-                name: technology,
-                slug: technology.toLowerCase().replace(/\s+/g, '-'),
-              },
-            })),
-          },
+          image: `https://avatar.vercel.sh/${userData.name.toLowerCase().replace(/\s+/g, '-')}`,
         },
       });
     } catch (error) {
@@ -117,38 +88,9 @@ export class UserService {
       const user = await this.prisma.user.update({
         where: { email: userData.email },
         data: {
-          username: userData.username,
           name: userData.name,
-          slug: userData.name.toLowerCase().replace(/\s+/g, '-'),
           email: userData.email,
-          worksAt: userData.worksAt,
-          location: userData.location,
-          linkedin: userData.linkedin,
-          github: userData.github,
-          website: userData.website,
-          bio: userData.bio,
-          about: userData.about,
-          image:
-            userData.image ||
-            `https://avatar.vercel.sh/${userData.name.toLowerCase().replace(/\s+/g, '-')}`,
-          especialities: {
-            connectOrCreate: userData.especialities.map((especiality) => ({
-              where: { slug: especiality.toLowerCase().replace(/\s+/g, '-') },
-              create: {
-                name: especiality,
-                slug: especiality.toLowerCase().replace(/\s+/g, '-'),
-              },
-            })),
-          },
-          technologies: {
-            connectOrCreate: userData.technologies.map((technology) => ({
-              where: { slug: technology.toLowerCase().replace(/\s+/g, '-') },
-              create: {
-                name: technology,
-                slug: technology.toLowerCase().replace(/\s+/g, '-'),
-              },
-            })),
-          },
+          image: `https://avatar.vercel.sh/${userData.name.toLowerCase().replace(/\s+/g, '-')}`,
         },
       });
 
@@ -164,28 +106,12 @@ export class UserService {
         throw new BadRequestException('Field and value are required');
       }
 
-      if (
-        field !== 'id' &&
-        field !== 'email' &&
-        field !== 'slug' &&
-        field !== 'username'
-      ) {
+      if (field !== 'id' && field !== 'email') {
         throw new BadRequestException('Invalid field for user lookup');
       }
 
       const user = await this.prisma.user.findUnique({
-        where:
-          field === 'id'
-            ? { id: value }
-            : field === 'email'
-              ? { email: value }
-              : field === 'slug'
-                ? { slug: value }
-                : { username: value },
-        include: {
-          especialities: true,
-          technologies: true,
-        },
+        where: field === 'id' ? { id: value } : { email: value },
       });
 
       if (!user) {

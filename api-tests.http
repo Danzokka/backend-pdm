@@ -1,0 +1,95 @@
+### Variáveis globais
+@baseUrl = http://localhost:5000
+@authToken = {{login.response.body.accessToken}}
+
+### Criar novo usuário
+# @name createUser
+POST {{baseUrl}}/user
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "name": "Usuário Teste",
+  "email": "teste@example.com",
+  "password": "senha123",
+  "location": "São Paulo",
+  "bio": "Testando o sistema de medicamentos",
+  "especialities": ["medicina", "farmacologia"],
+  "technologies": ["saúde", "bem-estar"]
+}
+
+### Fazer login para obter token JWT
+# @name login
+POST {{baseUrl}}/auth
+Content-Type: application/json
+
+{
+  "email": "teste@example.com",
+  "password": "senha123"
+}
+
+### Criar um medicamento
+# @name createMedication
+POST {{baseUrl}}/medication
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "nome": "Paracetamol",
+  "descricao": "Analgésico para dores de cabeça e febre",
+  "horario": "{{$datetime iso8601}}",
+  "imagem": "https://example.com/paracetamol.jpg"
+}
+
+### Criar medicamento com horário específico (para testar notificações)
+# @name createMedicationWithTime
+POST {{baseUrl}}/medication
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "nome": "Remédio com horário",
+  "descricao": "Teste do sistema de notificações",
+  "horario": "{{$datetime 'YYYY-MM-DDTHH:mm:ss.SSSZ' 300000}}",
+  "imagem": "https://example.com/medicine.jpg"
+}
+
+### Listar todos os medicamentos
+# @name listMedications
+GET {{baseUrl}}/medication
+Authorization: Bearer {{authToken}}
+
+### Obter um medicamento específico
+# @name getMedication
+GET {{baseUrl}}/medication/{{createMedication.response.body.id}}
+Authorization: Bearer {{authToken}}
+
+### Atualizar um medicamento
+# @name updateMedication
+PATCH {{baseUrl}}/medication/{{createMedication.response.body.id}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "nome": "Paracetamol 500mg",
+  "descricao": "Analgésico e antitérmico para alívio de dores e febre"
+}
+
+### Excluir um medicamento
+# @name deleteMedication
+DELETE {{baseUrl}}/medication/{{createMedication.response.body.id}}
+Authorization: Bearer {{authToken}}
+
+### Como usar este arquivo:
+# 1. Abra este arquivo no VS Code com a extensão REST Client instalada
+# 2. Clique em "Send Request" acima de cada requisição para executá-la
+# 3. As requisições que dependem de outras (como usar o token de autenticação)
+#    funcionam automaticamente, pois usam a sintaxe de referência {{variavel}}
+# 4. Para testar o sistema de notificações, use a request createMedicationWithTime
+#    que cria um medicamento com horário alguns minutos à frente
+
+### Dicas:
+# - Execute as requisições em ordem (criar usuário, login, etc.)
+# - O token é automaticamente capturado na resposta do login
+# - Os IDs dos medicamentos são capturados das respostas para uso em outras requisições
+# - Para testar as notificações, o sistema deve estar rodando quando o horário do medicamento chegar
