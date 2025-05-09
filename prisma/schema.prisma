@@ -15,11 +15,12 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  name     String
-  email    String @unique
-  password String
-  image    String
+  id          String       @id @default(uuid())
+  name        String
+  email       String       @unique
+  password    String
+  image       String
+  medications Medication[]
 }
 
 model Medication {
@@ -28,4 +29,6 @@ model Medication {
   descricao String
   horario   DateTime
   imagem    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 }
