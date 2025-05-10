@@ -5,11 +5,9 @@ services:
     container_name: medcontrol_api
     build:
       context: .
-      target: development
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    command: npm run start:dev
     env_file:
       - .env
     ports:

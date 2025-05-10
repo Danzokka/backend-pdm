@@ -1,4 +1,4 @@
-FROM node:18-alpine AS development
+FROM node:latest AS development
 
 # Diretório de trabalho
 WORKDIR /usr/src/app
@@ -19,7 +19,7 @@ RUN npx prisma generate
 # Compilar a aplicação
 RUN npm run build
 
-FROM node:18-alpine AS production
+FROM node:latest AS production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
@@ -42,4 +42,4 @@ COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 EXPOSE 5000
 
 # Iniciar a aplicação
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:prod"]
