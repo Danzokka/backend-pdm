@@ -2,6 +2,14 @@
 @baseUrl = http://localhost:5000
 @authToken = {{login.response.body.accessToken}}
 
+@userId = {{login.response.body.id}}
+
+### Pegar todos os usuários
+# @name getAllUsers
+GET {{baseUrl}}/user?field=id&value={{userId}}
+Content-Type: application/json
+
+
 ### Criar novo usuário
 # @name createUser
 POST {{baseUrl}}/user
