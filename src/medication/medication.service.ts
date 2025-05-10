@@ -19,7 +19,7 @@ export class MedicationService {
           nome: createMedicationDto.nome,
           descricao: createMedicationDto.descricao,
           horario: new Date(createMedicationDto.horario),
-          imagem: createMedicationDto.imagem,
+          imagem: `https://avatar.vercel.sh/${createMedicationDto.nome.toLowerCase().replace(/\s+/g, '-')}`,
           userId: userId,
         },
       });

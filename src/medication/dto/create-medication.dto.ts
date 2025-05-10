@@ -13,7 +13,4 @@ export class CreateMedicationDto {
   @IsNotEmpty()
   horario: string;
 
-  @IsString()
-  @IsNotEmpty()
-  imagem: string;
 }
