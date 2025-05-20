@@ -30,7 +30,7 @@
 ![Badge Status](https://img.shields.io/badge/status-em%20desenvolvimento-green)
 ![GitHub](https://img.shields.io/github/license/Danzokka/backend-pdm)
 
-> Backend de gerenciamento de medicamentos com notificações automáticas para lembrete de horários de medicação
+> Backend de gerenciamento de medicamentos com notificações automáticas para lembrete de horários de medicação. Suporta usuários dependentes e gerenciamento de doenças.
 
 ## 📑 Índice
 
@@ -77,11 +77,27 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 - Atualização de perfil
 - Reset de senha
 
+### 👨‍👩‍👧‍👦 Usuários Dependentes
+
+- Cadastro de usuários dependentes vinculados ao usuário principal
+- Gerenciamento de dependentes (adicionar, listar, visualizar, remover)
+- Atribuição de medicamentos a dependentes
+- Atribuição de doenças a dependentes
+
+### 🩺 Gerenciamento de Doenças
+
+- Cadastro de doenças
+- Atribuição de doenças a usuários e dependentes
+- Listagem de doenças cadastradas
+- Atualização e exclusão de doenças
+
 ### 💊 Gerenciamento de Medicamentos
 
 - Cadastro de medicamentos com descrição e imagem
 - Definição de horários para administração
-- Listagem de todos os medicamentos do usuário
+- Configuração de dias da semana para administração do medicamento
+- Vinculação de medicamentos a usuários ou dependentes
+- Listagem de todos os medicamentos (do usuário e seus dependentes)
 - Visualização detalhada de medicamento específico
 - Atualização de informações de medicamentos
 - Exclusão de medicamentos
@@ -89,6 +105,7 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 ### ⏰ Sistema de Notificações
 
 - Verificação automática de horários de medicação (a cada minuto)
+- Suporte a notificações para medicamentos de dependentes
 - Notificação quando é hora de tomar um medicamento
 - Integração com serviços de notificação para dispositivos móveis
 
@@ -174,6 +191,8 @@ backend-pdm/
 ├── prisma/               # Configuração do Prisma e migrações
 ├── src/                  # Código-fonte da aplicação
 │   ├── auth/             # Módulo de autenticação
+│   ├── disease/          # Módulo de doenças
+│   ├── dependent-user/   # Módulo de usuários dependentes
 │   ├── medication/       # Módulo de medicamentos
 │   ├── user/             # Módulo de usuários
 │   ├── app.module.ts     # Módulo principal da aplicação
@@ -181,7 +200,8 @@ backend-pdm/
 ├── test/                 # Testes da aplicação
 ├── Dockerfile            # Configuração do Docker
 ├── docker-compose.yml    # Configuração do Docker Compose
-└── api-tests.http        # Arquivo de testes de API via REST Client
+├── api-tests.http        # Arquivo de testes de API principal
+└── dependent-disease-tests.http # Testes para dependentes e doenças
 ```
 
 ## 🛣️ Rotas
@@ -197,10 +217,25 @@ backend-pdm/
 
 - `POST /auth` - Realizar login e obter token JWT
 
+### 👨‍👩‍👧‍👦 Usuários Dependentes
+
+- `POST /dependent-user` - Cadastrar um novo usuário dependente
+- `GET /dependent-user` - Listar todos os usuários dependentes
+- `GET /dependent-user/:id` - Obter detalhes de um dependente específico
+- `DELETE /dependent-user/:id` - Remover um usuário dependente
+
+### 🩺 Doenças
+
+- `POST /disease` - Cadastrar uma nova doença
+- `GET /disease` - Listar todas as doenças
+- `GET /disease/:id` - Obter detalhes de uma doença específica
+- `PATCH /disease/:id` - Atualizar informações de uma doença
+- `DELETE /disease/:id` - Excluir uma doença
+
 ### 💊 Medicamentos
 
-- `POST /medication` - Cadastrar um novo medicamento
-- `GET /medication` - Listar todos os medicamentos do usuário
+- `POST /medication` - Cadastrar um novo medicamento (para usuário ou dependente)
+- `GET /medication` - Listar todos os medicamentos (do usuário e dependentes)
 - `GET /medication/:id` - Obter detalhes de um medicamento específico
 - `PATCH /medication/:id` - Atualizar informações de um medicamento
 - `DELETE /medication/:id` - Excluir um medicamento

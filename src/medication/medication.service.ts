@@ -19,8 +19,18 @@ export class MedicationService {
           nome: createMedicationDto.nome,
           descricao: createMedicationDto.descricao,
           horario: new Date(createMedicationDto.horario),
-          imagem: `https://avatar.vercel.sh/${createMedicationDto.nome.toLowerCase().replace(/\s+/g, '-')}`,
-          userId: userId,
+          imagem:
+            createMedicationDto.imagem ||
+            `https://avatar.vercel.sh/${createMedicationDto.nome.toLowerCase().replace(/\s+/g, '-')}`,
+          daysOfWeek: createMedicationDto.daysOfWeek,
+          // If dependentUserId is provided, connect to dependent user, otherwise connect to main user
+          ...(createMedicationDto.dependentUserId
+            ? { dependentUserId: createMedicationDto.dependentUserId }
+            : { userId: userId }),
+        },
+        include: {
+          user: true,
+          dependentUser: true,
         },
       });
     } catch (error) {
@@ -30,9 +40,27 @@ export class MedicationService {
 
   async findAll(userId: string) {
     try {
+      // First, find all the user's dependent users
+      const dependentUsers = await this.prisma.dependentUser.findMany({
+        where: { userId },
+        select: { id: true },
+      });
+
+      const dependentUserIds = dependentUsers.map((du) => du.id);
+
+      // Find user's medications and dependent users' medications
       return await this.prisma.medication.findMany({
         where: {
-          userId: userId,
+          OR: [
+            { userId },
+            ...(dependentUserIds.length > 0
+              ? [{ dependentUserId: { in: dependentUserIds } }]
+              : []),
+          ],
+        },
+        include: {
+          user: true,
+          dependentUser: true,
         },
       });
     } catch (error) {
@@ -42,10 +70,27 @@ export class MedicationService {
 
   async findOne(id: string, userId: string) {
     try {
+      // First, find all the user's dependent users
+      const dependentUsers = await this.prisma.dependentUser.findMany({
+        where: { userId },
+        select: { id: true },
+      });
+
+      const dependentUserIds = dependentUsers.map((du) => du.id);
+
       const medication = await this.prisma.medication.findFirst({
         where: {
-          id: id,
-          userId: userId,
+          id,
+          OR: [
+            { userId },
+            ...(dependentUserIds.length > 0
+              ? [{ dependentUserId: { in: dependentUserIds } }]
+              : []),
+          ],
+        },
+        include: {
+          user: true,
+          dependentUser: true,
         },
       });
 
@@ -68,7 +113,7 @@ export class MedicationService {
     userId: string,
   ) {
     try {
-      // Verify if medication exists and belongs to the user
+      // Verify if medication exists and belongs to the user or its dependent users
       await this.findOne(id, userId);
 
       return await this.prisma.medication.update({
@@ -86,6 +131,16 @@ export class MedicationService {
           ...(updateMedicationDto.imagem && {
             imagem: updateMedicationDto.imagem,
           }),
+          ...(updateMedicationDto.daysOfWeek && {
+            daysOfWeek: updateMedicationDto.daysOfWeek,
+          }),
+          ...(updateMedicationDto.dependentUserId && {
+            dependentUserId: updateMedicationDto.dependentUserId,
+          }),
+        },
+        include: {
+          user: true,
+          dependentUser: true,
         },
       });
     } catch (error) {
@@ -98,7 +153,7 @@ export class MedicationService {
 
   async remove(id: string, userId: string) {
     try {
-      // Verify if medication exists and belongs to the user
+      // Verify if medication exists and belongs to the user or its dependent users
       await this.findOne(id, userId);
 
       return await this.prisma.medication.delete({
@@ -143,18 +198,23 @@ export class MedicationService {
       },
       include: {
         user: true,
+        dependentUser: true,
       },
     });
 
     // Process each medication
     for (const medication of medications) {
       // Here you would trigger your notification event
-      console.log(
-        `Sending reminder for medication: ${medication.nome} to user: ${medication.user.name}`,
-      );
+      if (medication.user) {
+        console.log(
+          `Sending reminder for medication: ${medication.nome} to user: ${medication.user.name}`,
+        );
+      } else if (medication.dependentUser) {
+        console.log(
+          `Sending reminder for medication: ${medication.nome} to dependent user: ${medication.dependentUser.name}`,
+        );
+      }
       // You could implement a notification service that sends push notifications, emails, etc.
-      // For example:
-      // this.notificationService.sendMedicationReminder(medication, medication.user);
     }
   }
 }

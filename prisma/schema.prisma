@@ -11,20 +11,45 @@ datasource db {
 }
 
 model User {
+  id             String          @id @default(uuid())
+  name           String
+  email          String          @unique
+  password       String
+  image          String
+  medications    Medication[]
+  dependentUsers DependentUser[]
+  diseases       Disease[]
+}
+
+model DependentUser {
   id          String       @id @default(uuid())
   name        String
-  email       String       @unique
-  password    String
   image       String
+  description String
+  birthDate   DateTime
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
   medications Medication[]
+  diseases    Disease[]
+}
+
+model Disease {
+  id             String          @id @default(uuid())
+  name           String
+  users          User[]
+  dependentUsers DependentUser[]
 }
 
 model Medication {
-  id        String   @id @default(uuid())
-  nome      String
-  descricao String
-  horario   DateTime
-  imagem    String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  id              String         @id @default(uuid())
+  nome            String
+  descricao       String
+  horario         DateTime
+  imagem          String
+  daysOfWeek      String         // Stored as a comma-separated string e.g. "1,3,5" for Monday, Wednesday, Friday
+  userId          String?
+  user            User?          @relation(fields: [userId], references: [id])
+  dependentUserId String?
+  dependentUser   DependentUser? @relation(fields: [dependentUserId], references: [id])
+
 }

@@ -21,4 +21,12 @@ export class UpdateMedicationDto {
   @IsString()
   @IsOptional()
   imagem?: string;
+
+  @IsString()
+  @IsOptional()
+  daysOfWeek?: string;
+
+  @IsString()
+  @IsOptional()
+  dependentUserId?: string;
 }

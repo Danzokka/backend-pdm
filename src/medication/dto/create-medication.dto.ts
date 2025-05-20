@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, IsDateString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsDateString,
+  IsOptional,
+  IsArray,
+} from 'class-validator';
 
 export class CreateMedicationDto {
   @IsString()
@@ -13,4 +19,15 @@ export class CreateMedicationDto {
   @IsNotEmpty()
   horario: string;
 
+  @IsString()
+  @IsOptional()
+  imagem?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  daysOfWeek: string;
+
+  @IsString()
+  @IsOptional()
+  dependentUserId?: string;
 }

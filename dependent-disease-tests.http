@@ -1,0 +1,84 @@
+### Variáveis para novas entidades
+@dependentUserId = {{createDependentUser.response.body.id}}
+@diseaseId = {{createDisease.response.body.id}}
+
+### Criar uma doença
+# @name createDisease
+POST {{baseUrl}}/disease
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Diabetes"
+}
+
+### Listar todas as doenças
+# @name listDiseases
+GET {{baseUrl}}/disease
+Authorization: Bearer {{authToken}}
+
+### Obter uma doença específica
+# @name getDisease
+GET {{baseUrl}}/disease/{{diseaseId}}
+Authorization: Bearer {{authToken}}
+
+### Atualizar uma doença
+# @name updateDisease
+PATCH {{baseUrl}}/disease/{{diseaseId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Diabetes Tipo 2"
+}
+
+### Excluir uma doença
+# @name deleteDisease
+DELETE {{baseUrl}}/disease/{{diseaseId}}
+Authorization: Bearer {{authToken}}
+
+### Criar um usuário dependente
+# @name createDependentUser
+POST {{baseUrl}}/dependent-user
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Dependente Teste",
+  "description": "Usuário dependente para testes",
+  "birthDate": "2010-01-01T00:00:00.000Z",
+  "diseases": [
+    {
+      "id": "{{diseaseId}}"
+    }
+  ]
+}
+
+### Listar todos os usuários dependentes
+# @name listDependentUsers
+GET {{baseUrl}}/dependent-user
+Authorization: Bearer {{authToken}}
+
+### Obter um usuário dependente específico
+# @name getDependentUser
+GET {{baseUrl}}/dependent-user/{{dependentUserId}}
+Authorization: Bearer {{authToken}}
+
+### Excluir um usuário dependente
+# @name deleteDependentUser
+DELETE {{baseUrl}}/dependent-user/{{dependentUserId}}
+Authorization: Bearer {{authToken}}
+
+### Criar um medicamento para um usuário dependente
+# @name createMedicationForDependentUser
+POST {{baseUrl}}/medication
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "nome": "Medicamento do Dependente",
+  "descricao": "Medicamento para o usuário dependente",
+  "horario": "{{$datetime iso8601}}",
+  "daysOfWeek": "1,3,5",
+  "dependentUserId": "{{dependentUserId}}"
+}
